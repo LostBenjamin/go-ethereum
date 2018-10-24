@@ -1211,8 +1211,17 @@ func MakeGenesis(ctx *cli.Context) *core.Genesis {
 	return genesis
 }
 
+// (anodar) MakeChain
 // MakeChain creates a chain manager from set command line flags.
 func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chainDb ethdb.Database) {
+	os.Exit(1)
+	fmt.Println("MakeChain")
+	fmt.Println("************************")
+	fmt.Println("************************")
+	fmt.Println("************************")
+	fmt.Println("************************")
+	fmt.Println("************************")
+	fmt.Println("************************")
 	var err error
 	chainDb = MakeChainDatabase(ctx, stack)
 
@@ -1225,7 +1234,9 @@ func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chai
 		engine = clique.New(config.Clique, chainDb)
 	} else {
 		engine = ethash.NewFaker()
+		fmt.Println("************************")
 		if !ctx.GlobalBool(FakePoWFlag.Name) {
+			fmt.Println("fakePoWFlag not set")
 			engine = ethash.New(ethash.Config{
 				CacheDir:       stack.ResolvePath(eth.DefaultConfig.Ethash.CacheDir),
 				CachesInMem:    eth.DefaultConfig.Ethash.CachesInMem,
@@ -1234,6 +1245,8 @@ func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chai
 				DatasetsInMem:  eth.DefaultConfig.Ethash.DatasetsInMem,
 				DatasetsOnDisk: eth.DefaultConfig.Ethash.DatasetsOnDisk,
 			})
+		} else {
+			fmt.Println("fakePoW is set")
 		}
 	}
 	if gcmode := ctx.GlobalString(GCModeFlag.Name); gcmode != "full" && gcmode != "archive" {

@@ -72,6 +72,7 @@ func NewInterpreter(evm *EVM, cfg Config) *Interpreter {
 			cfg.JumpTable = frontierInstructionSet
 		}
 	}
+	// fmt.Printf("(anodar) setting vmconfig to: %+v\n\n\n\n\n\n\n", cfg)
 
 	return &Interpreter{
 		evm:      evm,
@@ -104,6 +105,7 @@ func (in *Interpreter) enforceRestrictions(op OpCode, operation operation, stack
 // considered a revert-and-consume-all-gas operation except for
 // errExecutionReverted which means revert-and-keep-gas-left.
 func (in *Interpreter) Run(contract *Contract, input []byte) (ret []byte, err error) {
+	// fmt.Println("Interpreter running")
 	// Increment the call depth which is restricted to 1024
 	in.evm.depth++
 	defer func() { in.evm.depth-- }()
@@ -114,6 +116,7 @@ func (in *Interpreter) Run(contract *Contract, input []byte) (ret []byte, err er
 
 	// Don't bother with the execution if there's no code.
 	if len(contract.Code) == 0 {
+		// panic("(anodar) no code")
 		return nil, nil
 	}
 
@@ -174,6 +177,8 @@ func (in *Interpreter) Run(contract *Contract, input []byte) (ret []byte, err er
 		// the operation
 		if operation.memorySize != nil {
 			memSize, overflow := bigUint64(operation.memorySize(stack))
+			// fmt.Printf("(anodar) stack memory size: %+v\t overflow %+v\n", memSize, overflow)
+			// fmt.Printf("stack:%+v\n", stack)
 			if overflow {
 				return nil, errGasUintOverflow
 			}
@@ -186,7 +191,9 @@ func (in *Interpreter) Run(contract *Contract, input []byte) (ret []byte, err er
 		// consume the gas and return an error if not enough gas is available.
 		// cost is explicitly set so that the capture state defer method can get the proper cost
 		cost, err = operation.gasCost(in.gasTable, in.evm, contract, stack, mem, memorySize)
+		// fmt.Printf("cost: %+v\n", cost)
 		if err != nil || !contract.UseGas(cost) {
+			// panic(err)
 			return nil, ErrOutOfGas
 		}
 		if memorySize > 0 {
@@ -197,6 +204,8 @@ func (in *Interpreter) Run(contract *Contract, input []byte) (ret []byte, err er
 			in.cfg.Tracer.CaptureState(in.evm, pc, op, gasCopy, cost, mem, stack, contract, in.evm.depth, err)
 			logged = true
 		}
+
+
 
 		// execute the operation
 		res, err := operation.execute(&pc, in.evm, contract, mem, stack)

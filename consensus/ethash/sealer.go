@@ -18,6 +18,7 @@ package ethash
 
 import (
 	crand "crypto/rand"
+	"fmt"
 	"math"
 	"math/big"
 	"math/rand"
@@ -34,7 +35,16 @@ import (
 // the block's difficulty requirements.
 func (ethash *Ethash) Seal(chain consensus.ChainReader, block *types.Block, stop <-chan struct{}) (*types.Block, error) {
 	// If we're running a fake PoW, simply return a 0 nonce immediately
+
+  // (anodar) debug Seal(), hardcode PoW as ModeFake
+	// fmt.Printf("***************************************		entering Seal")
+	log.Info(fmt.Sprintf("***************************************		PowMode %+v", ethash.config.PowMode))
+	log.Info(fmt.Sprintf("***************************************		ModeFake %+v", ModeFake))
+	// fmt.Printf("***************************************		ModeFullFake %+v", ModeFullFake)
+	// ethash.config.PowMode = ModeFake
+
 	if ethash.config.PowMode == ModeFake || ethash.config.PowMode == ModeFullFake {
+		// log.Info("***************************************		returning 0 nonce")
 		header := block.Header()
 		header.Nonce, header.MixDigest = types.BlockNonce{}, common.Hash{}
 		return block.WithSeal(header), nil

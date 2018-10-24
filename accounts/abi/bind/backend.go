@@ -81,6 +81,7 @@ type ContractTransactor interface {
 	// for setting a reasonable default.
 	EstimateGas(ctx context.Context, call ethereum.CallMsg) (gas uint64, err error)
 	// SendTransaction injects the transaction into the pending pool for execution.
+	// (anodar) sendTransaction
 	SendTransaction(ctx context.Context, tx *types.Transaction) error
 }
 

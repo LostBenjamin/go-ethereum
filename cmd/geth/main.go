@@ -24,6 +24,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	// "runtime/pprof"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
@@ -41,6 +42,10 @@ import (
 const (
 	clientIdentifier = "geth" // Client identifier to advertise over the network
 )
+
+
+var cpuprofile = "/home/anodar/Desktop/profiles/cpu.profile" //flag.String("cpuprofile", "cpu.profile", "write cpu profile to `file`")
+var memprofile = "/home/anodar/Desktop/profiles/mem.profile" //flag.String("memprofile", "mem.profile", "write memory profile to `file`")
 
 var (
 	// Git SHA1 commit hash of the release (set via linker flags)
@@ -203,10 +208,39 @@ func init() {
 }
 
 func main() {
+	// ************** //
+	/* (anodar) cpuprofile
+	if cpuprofile != "" {
+	    f, err := os.Create(cpuprofile)
+	    if err != nil {
+	        log.Error("could not create CPU profile: ", err)
+	    }
+	    if err := pprof.StartCPUProfile(f); err != nil {
+	        log.Error("could not start CPU profile: ", err)
+	    }
+	    defer pprof.StopCPUProfile()
+	}
+	fmt.Println("it's on");
+	// ************** //
+	*/
+	fmt.Println("main")
 	if err := app.Run(os.Args); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+ /* (anodar) memprofile
+	if memprofile != "" {
+	    f, err := os.Create(memprofile)
+	    if err != nil {
+	        log.Error("could not create memory profile: ", err)
+	    }
+	    runtime.GC() // get up-to-date statistics
+	    if err := pprof.WriteHeapProfile(f); err != nil {
+	        log.Error("could not write memory profile: ", err)
+	    }
+	    f.Close()
+	}
+*/
 }
 
 // geth is the main entry point into the system if no special subcommand is ran.

@@ -190,6 +190,7 @@ type storageblock struct {
 	TD     *big.Int
 }
 
+// (anodar) NewBlock(): received header, transaction and returns block 
 // NewBlock creates a new block. The input data is copied,
 // changes to header and to the field values will not affect the
 // block.

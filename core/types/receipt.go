@@ -82,6 +82,7 @@ type receiptStorageRLP struct {
 	GasUsed           uint64
 }
 
+// (anodar) NewReceipt
 // NewReceipt creates a barebone transaction receipt, copying the init fields.
 func NewReceipt(root []byte, failed bool, cumulativeGasUsed uint64) *Receipt {
 	r := &Receipt{PostState: common.CopyBytes(root), CumulativeGasUsed: cumulativeGasUsed}

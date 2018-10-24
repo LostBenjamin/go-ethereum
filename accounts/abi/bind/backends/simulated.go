@@ -62,6 +62,8 @@ type SimulatedBackend struct {
 	config *params.ChainConfig
 }
 
+
+// (anodar) Simulated Backend, IMPORTANT 
 // NewSimulatedBackend creates a new binding backend using a simulated blockchain
 // for testing purposes.
 func NewSimulatedBackend(alloc core.GenesisAlloc) *SimulatedBackend {

@@ -17,6 +17,8 @@
 package vm
 
 import (
+	// "fmt"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/params"
@@ -25,7 +27,6 @@ import (
 // memoryGasCosts calculates the quadratic gas for memory expansion. It does so
 // only for the memory region that is expanded, not the total memory.
 func memoryGasCost(mem *Memory, newMemSize uint64) (uint64, error) {
-
 	if newMemSize == 0 {
 		return 0, nil
 	}
@@ -37,6 +38,7 @@ func memoryGasCost(mem *Memory, newMemSize uint64) (uint64, error) {
 	// The constant 0xffffffffe0 is the highest number that can be used without
 	// overflowing the gas calculation
 	if newMemSize > 0xffffffffe0 {
+		// fmt.Printf("anodar newMemsize: %+v\n", newMemSize)
 		return 0, errGasUintOverflow
 	}
 
@@ -66,6 +68,7 @@ func constGasFunc(gas uint64) gasFunc {
 func gasCallDataCopy(gt params.GasTable, evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
 	gas, err := memoryGasCost(mem, memorySize)
 	if err != nil {
+		panic(err)
 		return 0, err
 	}
 
@@ -216,6 +219,8 @@ func gasCodeCopy(gt params.GasTable, evm *EVM, contract *Contract, stack *Stack,
 }
 
 func gasExtCodeCopy(gt params.GasTable, evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
+	// fmt.Printf("gasExtCodeCopy\n")
+	// panic("gasExCodeCopy")
 	gas, err := memoryGasCost(mem, memorySize)
 	if err != nil {
 		return 0, err

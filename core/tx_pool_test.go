@@ -44,6 +44,7 @@ func init() {
 	testTxPoolConfig.Journal = ""
 }
 
+// (anodar) testBlockChain
 type testBlockChain struct {
 	statedb       *state.StateDB
 	gasLimit      uint64

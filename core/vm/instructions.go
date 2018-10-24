@@ -470,6 +470,7 @@ func opCodeSize(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack 
 }
 
 func opCodeCopy(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
+	// panic("opCodeCopy")
 	var (
 		memOffset  = stack.pop()
 		codeOffset = stack.pop()
@@ -483,6 +484,7 @@ func opCodeCopy(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack 
 }
 
 func opExtCodeCopy(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
+	// panic("oxExtCodeCopy")
 	var (
 		addr       = common.BigToAddress(stack.pop())
 		memOffset  = stack.pop()

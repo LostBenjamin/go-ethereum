@@ -645,6 +645,7 @@ func TestUnpackEvent(t *testing.T) {
 		t.Errorf("len(data) is %d, want a non-multiple of 32", len(data))
 	}
 
+// (anodar) event related stuff
 	type ReceivedEvent struct {
 		Address common.Address
 		Amount  *big.Int

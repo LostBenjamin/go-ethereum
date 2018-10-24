@@ -17,6 +17,7 @@
 package core
 
 import (
+	// "fmt"
 	"errors"
 	"math"
 	"math/big"
@@ -129,6 +130,10 @@ func NewStateTransition(evm *vm.EVM, msg Message, gp *GasPool) *StateTransition 
 // indicates a core error meaning that the message would always fail for that particular
 // state and would never be accepted within a block.
 func ApplyMessage(evm *vm.EVM, msg Message, gp *GasPool) ([]byte, uint64, bool, error) {
+	//(anodar) debug
+	// fmt.Println("ApplyMessage    ***************************")
+	// os.Exit(1)
+
 	return NewStateTransition(evm, msg, gp).TransitionDb()
 }
 
@@ -188,6 +193,7 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 	sender := vm.AccountRef(msg.From())
 	homestead := st.evm.ChainConfig().IsHomestead(st.evm.BlockNumber)
 	contractCreation := msg.To() == nil
+	// fmt.Printf("contract creation: %+v, to: %+v\n", contractCreation, msg.To)
 
 	// Pay intrinsic gas
 	gas, err := IntrinsicGas(st.data, contractCreation, homestead)

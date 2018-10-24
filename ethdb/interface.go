@@ -25,6 +25,8 @@ type Putter interface {
 	Put(key []byte, value []byte) error
 }
 
+
+// (anodar) database interface
 // Database wraps all database operations. All methods are safe for concurrent use.
 type Database interface {
 	Putter

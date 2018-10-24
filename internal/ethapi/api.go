@@ -1034,6 +1034,31 @@ func (s *PublicTransactionPoolAPI) GetRawTransactionByHash(ctx context.Context, 
 
 // GetTransactionReceipt returns the transaction receipt for the given transaction hash.
 func (s *PublicTransactionPoolAPI) GetTransactionReceipt(ctx context.Context, hash common.Hash) (map[string]interface{}, error) {
+	/*
+		(anodar)IMPROVE: GetTransactionReceipt looks up all receipts in block
+	  then looks up index and returns receipts[index]
+		note: looks up transactoin itself as well
+	*/
+	//
+	// myFields := map[string]interface{}{
+	// 	"blockHash":         "",
+	// 	"blockNumber":       "",
+	// 	"transactionHash":   "",
+	// 	"transactionIndex":  "",
+	// 	"from":              "",
+	// 	"to":                "",
+	// 	"gasUsed":           "",
+	// 	"cumulativeGasUsed": "",
+	// 	"contractAddress":   "",
+	// 	"logs":              "",
+	// 	"logsBloom":         "",
+	// }
+	// return myFields, nil;
+
+
+
+
+	// log.Info(fmt.Sprintf("(anodar) GetTransactionReceipt %+v %+v", ctx, hash))
 	tx, blockHash, blockNumber, index := core.GetTransaction(s.b.ChainDb(), hash)
 	if tx == nil {
 		return nil, nil

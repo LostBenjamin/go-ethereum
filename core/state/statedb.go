@@ -83,6 +83,7 @@ type StateDB struct {
 	lock sync.Mutex
 }
 
+// (anodar) new state
 // Create a new state from a given trie.
 func New(root common.Hash, db Database) (*StateDB, error) {
 	tr, err := db.OpenTrie(root)

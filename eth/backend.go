@@ -1,4 +1,4 @@
-// Copyright 2014 The go-ethereum Authors
+ // Copyright 2014 The go-ethereum Authors
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -210,17 +210,34 @@ func CreateDB(ctx *node.ServiceContext, config *Config, name string) (ethdb.Data
 	return db, nil
 }
 
+
+// (anodar) CreateConsensusEngine VERY INTERESTING PLACE !!!
 // CreateConsensusEngine creates the required type of consensus engine instance for an Ethereum service
 func CreateConsensusEngine(ctx *node.ServiceContext, config *ethash.Config, chainConfig *params.ChainConfig, db ethdb.Database) consensus.Engine {
 	// If proof-of-authority is requested, set it up
 	if chainConfig.Clique != nil {
 		return clique.New(chainConfig.Clique, db)
 	}
+
+	fmt.Println("CreateConsensusEngine")
+	fmt.Println("**********************************")
+	fmt.Println("**********************************")
+	fmt.Println("**********************************")
+	fmt.Println("**********************************")
+	fmt.Println("**********************************")
+	fmt.Printf("config.PowMode %+v\n", config.PowMode)
+	config.PowMode = ethash.ModeFake
 	// Otherwise assume proof-of-work
 	switch {
 	case config.PowMode == ethash.ModeFake:
 		log.Warn("Ethash used in fake mode")
 		return ethash.NewFaker()
+  //**************   >>>>
+	case config.PowMode == ethash.ModeFullFake:
+		log.Warn("Ethash used in full fake mode")
+		engine := ethash.NewFullFaker()
+		return engine
+//*****************  <<<<
 	case config.PowMode == ethash.ModeTest:
 		log.Warn("Ethash used in test mode")
 		return ethash.NewTester()
@@ -228,6 +245,7 @@ func CreateConsensusEngine(ctx *node.ServiceContext, config *ethash.Config, chai
 		log.Warn("Ethash used in shared mode")
 		return ethash.NewShared()
 	default:
+		fmt.Println("**********calling ethash.New in CreateConsensusEngine")
 		engine := ethash.New(ethash.Config{
 			CacheDir:       ctx.ResolvePath(config.CacheDir),
 			CachesInMem:    config.CachesInMem,

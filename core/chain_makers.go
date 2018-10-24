@@ -252,6 +252,12 @@ func makeHeader(chain consensus.ChainReader, parent *types.Block, state *state.S
 	}
 }
 
+
+// (anodar) export newCanonical
+func ExpNewCanonical(engine consensus.Engine, n int, full bool) (ethdb.Database, *BlockChain, error) {
+	return newCanonical(engine, n, full)
+}
+
 // newCanonical creates a chain database, and injects a deterministic canonical
 // chain. Depending on the full flag, if creates either a full block chain or a
 // header only chain.

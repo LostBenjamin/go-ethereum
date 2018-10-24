@@ -17,6 +17,8 @@
 package core
 
 import (
+	// "fmt"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/consensus/misc"
@@ -24,6 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
+	// "github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 )
 
@@ -54,6 +57,12 @@ func NewStateProcessor(config *params.ChainConfig, bc *BlockChain, engine consen
 // returns the amount of gas that was used in the process. If any of the
 // transactions failed to execute due to insufficient gas it will return an error.
 func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg vm.Config) (types.Receipts, []*types.Log, uint64, error) {
+	/******(anodar)  Process **/
+	// log.Debug("entering Process, *********************************");
+	// fmt.Println("entering Process, *********************************");
+	// defer profile.Start().Stop()
+	// os.Exit(1)
+	/***********************/
 	var (
 		receipts types.Receipts
 		usedGas  = new(uint64)
@@ -86,7 +95,14 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 // for the transaction, gas used and an error if the transaction failed,
 // indicating the block was invalid.
 func ApplyTransaction(config *params.ChainConfig, bc *BlockChain, author *common.Address, gp *GasPool, statedb *state.StateDB, header *types.Header, tx *types.Transaction, usedGas *uint64, cfg vm.Config) (*types.Receipt, uint64, error) {
+	/*(anodar)  ApplyTransaction/
+	// fmt.Println("ApplyTransaction    ***************************")
+	// defer profile.Start().Stop()
+	// os.Exit(1)
+	/***************************/
+
 	msg, err := tx.AsMessage(types.MakeSigner(config, header.Number))
+	// fmt.Printf("msg: %+v\n\n\n\n\n\n", msg)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -109,6 +125,8 @@ func ApplyTransaction(config *params.ChainConfig, bc *BlockChain, author *common
 	}
 	*usedGas += gas
 
+
+	// (anodar) Receipt generation
 	// Create a new receipt for the transaction, storing the intermediate root and gas used by the tx
 	// based on the eip phase, we're passing wether the root touch-delete accounts.
 	receipt := types.NewReceipt(root, failed, *usedGas)

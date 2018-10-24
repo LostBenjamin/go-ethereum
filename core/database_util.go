@@ -31,6 +31,8 @@ import (
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rlp"
+	// "github.com/hashicorp/golang-lru"
+
 )
 
 // DatabaseReader wraps the Get method of a backing data store.
@@ -259,6 +261,8 @@ func GetBlockReceipts(db DatabaseReader, hash common.Hash, number uint64) types.
 	for i, receipt := range storageReceipts {
 		receipts[i] = (*types.Receipt)(receipt)
 	}
+	// (anodar) GetBlockReceipts: taking too much time
+	// log.Info(fmt.Sprintf("printing receipts %+v", receipts[0]))
 	return receipts
 }
 
@@ -282,6 +286,11 @@ func GetTxLookupEntry(db DatabaseReader, hash common.Hash) (common.Hash, uint64,
 // GetTransaction retrieves a specific transaction from the database, along with
 // its added positional metadata.
 func GetTransaction(db DatabaseReader, hash common.Hash) (*types.Transaction, common.Hash, uint64, uint64) {
+	/*
+		(anodar) GetTransaction looks up transaction index txIndex by it's hash
+	  looks up block by it's hash, and returns transaction with index txIndex
+	*/
+
 	// Retrieve the lookup metadata and resolve the transaction from the body
 	blockHash, blockNumber, txIndex := GetTxLookupEntry(db, hash)
 
@@ -319,6 +328,8 @@ func GetTransaction(db DatabaseReader, hash common.Hash) (*types.Transaction, co
 func GetReceipt(db DatabaseReader, hash common.Hash) (*types.Receipt, common.Hash, uint64, uint64) {
 	// Retrieve the lookup metadata and resolve the receipt from the receipts
 	blockHash, blockNumber, receiptIndex := GetTxLookupEntry(db, hash)
+	// (anodar) GetReceipt
+	log.Debug("GetReceipt: %v**********", receiptIndex)
 
 	if blockHash != (common.Hash{}) {
 		receipts := GetBlockReceipts(db, blockHash, blockNumber)
@@ -479,11 +490,28 @@ func WriteBlockReceipts(db ethdb.Putter, hash common.Hash, number uint64, receip
 	return nil
 }
 
+/**************************
+(anodar)
+"github.com/hashicorp/golang-lru"
+
+bodyCache    *lru.Cache
+self.bodyCache.Get(hash);
+self.bodyCache.Add(hash, body)
+
+var m map[common.Hash]string
+common.Hash
+***************************/
+
+
+
+
+
 // WriteTxLookupEntries stores a positional metadata for every transaction from
 // a block, enabling hash based transaction and receipt lookups.
 func WriteTxLookupEntries(db ethdb.Putter, block *types.Block) error {
 	// Iterate over each transaction and encode its metadata
 	for i, tx := range block.Transactions() {
+
 		entry := TxLookupEntry{
 			BlockHash:  block.Hash(),
 			BlockIndex: block.NumberU64(),

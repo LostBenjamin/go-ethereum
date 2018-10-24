@@ -41,6 +41,7 @@ type (
 // run runs the given contract and takes care of running precompiles with a fallback to the byte code interpreter.
 func run(evm *EVM, contract *Contract, input []byte) ([]byte, error) {
 	if contract.CodeAddr != nil {
+		// fmt.Println("run 0")
 		precompiles := PrecompiledContractsHomestead
 		if evm.ChainConfig().IsByzantium(evm.BlockNumber) {
 			precompiles = PrecompiledContractsByzantium
@@ -49,6 +50,7 @@ func run(evm *EVM, contract *Contract, input []byte) ([]byte, error) {
 			return RunPrecompiledContract(p, input, contract)
 		}
 	}
+	// fmt.Println("run 1")
 	return evm.interpreter.Run(contract, input)
 }
 
@@ -137,10 +139,11 @@ func (evm *EVM) Cancel() {
 // the necessary steps to create accounts and reverses the state in case of an
 // execution error or failed value transfer.
 func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas uint64, value *big.Int) (ret []byte, leftOverGas uint64, err error) {
+	// fmt.Println("anodar call called 0")
 	if evm.vmConfig.NoRecursion && evm.depth > 0 {
 		return nil, gas, nil
 	}
-
+	// fmt.Println("call called 1")
 	// Fail if we're trying to execute above the call depth limit
 	if evm.depth > int(params.CallCreateDepth) {
 		return nil, gas, ErrDepth
@@ -149,17 +152,20 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	if !evm.Context.CanTransfer(evm.StateDB, caller.Address(), value) {
 		return nil, gas, ErrInsufficientBalance
 	}
+	// fmt.Println("call called 2")
 
 	var (
 		to       = AccountRef(addr)
 		snapshot = evm.StateDB.Snapshot()
 	)
 	if !evm.StateDB.Exist(addr) {
+		// fmt.Printf("call called 2.2: addr: %+v doesn't exist\n", addr)
 		precompiles := PrecompiledContractsHomestead
 		if evm.ChainConfig().IsByzantium(evm.BlockNumber) {
 			precompiles = PrecompiledContractsByzantium
 		}
 		if precompiles[addr] == nil && evm.ChainConfig().IsEIP158(evm.BlockNumber) && value.Sign() == 0 {
+			// fmt.Println("call called 2.5")
 			return nil, gas, nil
 		}
 		evm.StateDB.CreateAccount(addr)
@@ -173,8 +179,11 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 
 	start := time.Now()
 
+	// fmt.Printf("call called 3, caller:%+v\n, to:%+v\n, value:%+v\n, gas:%+v\n contract:%+v\n", caller, to, value, gas, contract)
+	// fmt.Printf("statedb.getcode(addr): %+v\n", evm.StateDB.GetCode(addr))
 	// Capture the tracer start/end events in debug mode
 	if evm.vmConfig.Debug && evm.depth == 0 {
+		// fmt.Println("call called 4")
 		evm.vmConfig.Tracer.CaptureStart(caller.Address(), addr, false, input, gas, value)
 
 		defer func() { // Lazy evaluation of the parameters
@@ -182,11 +191,13 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 		}()
 	}
 	ret, err = run(evm, contract, input)
+	// fmt.Println("call called 5")
 
 	// When an error was returned by the EVM or when setting the creation code
 	// above we revert to the snapshot and consume any gas remaining. Additionally
 	// when we're in homestead this also counts for code storage gas errors.
 	if err != nil {
+		// fmt.Println("call called revert WTF")
 		evm.StateDB.RevertToSnapshot(snapshot)
 		if err != errExecutionReverted {
 			contract.UseGas(contract.Gas)

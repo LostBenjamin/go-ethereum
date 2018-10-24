@@ -126,6 +126,13 @@ func (s *Server) RegisterName(name string, rcvr interface{}) error {
 // requests until the codec returns an error when reading a request (in most cases
 // an EOF). It executes requests in parallel when singleShot is false.
 func (s *Server) serveRequest(codec ServerCodec, singleShot bool, options CodecOption, ctx context.Context) error {
+	// fmt.Println("serveRequest")
+	// fmt.Println("**********************")
+	// fmt.Println("**********************")
+	// fmt.Println("**********************")
+	// fmt.Println("**********************")
+	// fmt.Println(fmt.Sprintf("context: %+v", ctx))
+	// fmt.Println(fmt.Sprintf("codec: %+v", codec))
 	var pend sync.WaitGroup
 
 	defer func() {
@@ -142,6 +149,7 @@ func (s *Server) serveRequest(codec ServerCodec, singleShot bool, options CodecO
 
 	//	ctx, cancel := context.WithCancel(context.Background())
 	ctx, cancel := context.WithCancel(ctx)
+	// fmt.Println(fmt.Sprintf("ctx new: %+v", ctx))
 	defer cancel()
 
 	// if the codec supports notification include a notifier that callbacks can use
@@ -149,6 +157,7 @@ func (s *Server) serveRequest(codec ServerCodec, singleShot bool, options CodecO
 	// connection is closed the notifier will stop and cancels all active subscriptions.
 	if options&OptionSubscriptions == OptionSubscriptions {
 		ctx = context.WithValue(ctx, notifierKey{}, newNotifier(codec))
+		// fmt.Println(fmt.Sprintf("ctx new: %+v", ctx))
 	}
 	s.codecsMu.Lock()
 	if atomic.LoadInt32(&s.run) != 1 { // server stopped
@@ -161,6 +170,7 @@ func (s *Server) serveRequest(codec ServerCodec, singleShot bool, options CodecO
 	// test if the server is ordered to stop
 	for atomic.LoadInt32(&s.run) == 1 {
 		reqs, batch, err := s.readRequest(codec)
+		// fmt.Println(fmt.Sprintf("run=1\nreqs: %+v\n batch: %+v\n", reqs, batch))
 		if err != nil {
 			// If a parsing error occurred, send an error
 			if err.Error() != "EOF" {
@@ -192,6 +202,8 @@ func (s *Server) serveRequest(codec ServerCodec, singleShot bool, options CodecO
 			if batch {
 				s.execBatch(ctx, codec, reqs)
 			} else {
+				// str_req = fmt.Sprinf("id: %+v callb: %+v, args: %+v", req[0].id, req[0].callb, req[0].args)
+				// fmt.Println(fmt.Sprintf("exec\ncodec: %+v\n req: %+v\n", codec, str_req))
 				s.exec(ctx, codec, reqs[0])
 			}
 			return nil
@@ -204,6 +216,9 @@ func (s *Server) serveRequest(codec ServerCodec, singleShot bool, options CodecO
 			if batch {
 				s.execBatch(ctx, codec, reqs)
 			} else {
+				// req: &{id:0xc42344d560 svcname:eth callb:0xc420a9cdc0 args:[{typ:0xe83340 ptr:0xc439db8200 flag:401}] is
+				// str_req := fmt.Sprintf("id: %+v callb: %+v, args: %+v", reqs[0].id, reqs[0].callb, reqs[0].args)
+				// fmt.Println(fmt.Sprintf("exec\ncodec: %+v\n req: %+v\n", codec, str_req))
 				s.exec(ctx, codec, reqs[0])
 			}
 		}(reqs, batch)
@@ -292,6 +307,7 @@ func (s *Server) handle(ctx context.Context, codec ServerCodec, req *serverReque
 		return codec.CreateResponse(req.id, subid), activateSub
 	}
 
+	// (anodar) RPC call handled here
 	// regular RPC call, prepare arguments
 	if len(req.args) != len(req.callb.argTypes) {
 		rpcErr := &invalidParamsError{fmt.Sprintf("%s%s%s expects %d parameters, got %d",

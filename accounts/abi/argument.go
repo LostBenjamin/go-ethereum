@@ -94,7 +94,8 @@ func (arguments Arguments) Unpack(v interface{}, data []byte) error {
 	if err != nil {
 		return err
 	}
-	if arguments.isTuple() {
+	kind := reflect.ValueOf(v).Elem().Kind()
+	if arguments.isTuple() || kind == reflect.Slice || kind == reflect.Array {
 		return arguments.unpackTuple(v, marshalledValues)
 	}
 	return arguments.unpackAtomic(v, marshalledValues)
@@ -136,9 +137,8 @@ func (arguments Arguments) unpackTuple(v interface{}, marshalledValues []interfa
 				return err
 			}
 
-			if err := set(v.Elem(), reflectValue, arg); err != nil {
-				return err
-			}
+			v.Set(reflectValue)
+
 		default:
 			return fmt.Errorf("abi:[2] cannot unmarshal tuple in to %v", typ)
 		}

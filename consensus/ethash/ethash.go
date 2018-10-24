@@ -47,7 +47,7 @@ var (
 	maxUint256 = new(big.Int).Exp(big.NewInt(2), big.NewInt(256), big.NewInt(0))
 
 	// sharedEthash is a full instance that can be shared between multiple users.
-	sharedEthash = New(Config{"", 3, 0, "", 1, 0, ModeNormal})
+	// sharedEthash = New(Config{"", 3, 0, "", 1, 0, ModeNormal})
 
 	// algorithmRevision is the data structure version used for file naming.
 	algorithmRevision = 23
@@ -369,7 +369,7 @@ func MakeDataset(block uint64, dir string) {
 
 // Mode defines the type and amount of PoW verification an ethash engine makes.
 type Mode uint
-
+// (anodar) Pow modes
 const (
 	ModeNormal Mode = iota
 	ModeShared
@@ -413,6 +413,8 @@ type Ethash struct {
 
 // New creates a full sized ethash PoW scheme.
 func New(config Config) *Ethash {
+	fmt.Println(fmt.Sprintf("config: %+v", config))
+	panic("creation of full sized ethash PoW scheme was requested")
 	if config.CachesInMem <= 0 {
 		log.Warn("One ethash cache must always be in memory", "requested", config.CachesInMem)
 		config.CachesInMem = 1
@@ -435,6 +437,7 @@ func New(config Config) *Ethash {
 // NewTester creates a small sized ethash PoW scheme useful only for testing
 // purposes.
 func NewTester() *Ethash {
+	fmt.Println("************  calling Mew() from newTester")
 	return New(Config{CachesInMem: 1, PowMode: ModeTest})
 }
 
@@ -486,7 +489,8 @@ func NewFullFaker() *Ethash {
 // NewShared creates a full sized ethash PoW shared between all requesters running
 // in the same process.
 func NewShared() *Ethash {
-	return &Ethash{shared: sharedEthash}
+	return NewFaker()
+	// return &Ethash{shared: sharedEthash}
 }
 
 // cache tries to retrieve a verification cache for the specified block number

@@ -23,6 +23,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
+// (anodar) MemDatabase
 /*
  * This is a test memory database. Do not use for any production it does not get persisted
  */
@@ -42,6 +43,11 @@ func NewMemDatabaseWithCap(size int) (*MemDatabase, error) {
 		db: make(map[string][]byte, size),
 	}, nil
 }
+
+func (db *MemDatabase) GetDB() map[string][]byte{
+	return db.db;
+}
+
 
 func (db *MemDatabase) Put(key []byte, value []byte) error {
 	db.lock.Lock()

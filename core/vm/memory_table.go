@@ -18,6 +18,7 @@ package vm
 
 import (
 	"math/big"
+	// "fmt"
 
 	"github.com/ethereum/go-ethereum/common/math"
 )
@@ -27,18 +28,25 @@ func memorySha3(stack *Stack) *big.Int {
 }
 
 func memoryCallDataCopy(stack *Stack) *big.Int {
+	// fmt.Println("memoryCallDataCopy")
 	return calcMemSize(stack.Back(0), stack.Back(2))
 }
 
 func memoryReturnDataCopy(stack *Stack) *big.Int {
+	// fmt.Println("memoryReturnDataCopy")
 	return calcMemSize(stack.Back(0), stack.Back(2))
 }
 
 func memoryCodeCopy(stack *Stack) *big.Int {
+	// fmt.Printf("memoryCodeCopy, returning: %+v\n", calcMemSize(stack.Back(0), stack.Back(2)))
+	// fmt.Printf("stack back 0: %+v\n", stack.Back(0))
+	// fmt.Printf("stack back 1: %+v\n", stack.Back(1))
+	// fmt.Printf("stack back 2: %+v\n", stack.Back(2))
 	return calcMemSize(stack.Back(0), stack.Back(2))
 }
 
 func memoryExtCodeCopy(stack *Stack) *big.Int {
+	// fmt.Println("anodar: calculating memextcodecopy")
 	return calcMemSize(stack.Back(1), stack.Back(3))
 }
 
@@ -55,6 +63,7 @@ func memoryMStore(stack *Stack) *big.Int {
 }
 
 func memoryCreate(stack *Stack) *big.Int {
+	// fmt.Println("memoryCreate")
 	return calcMemSize(stack.Back(1), stack.Back(2))
 }
 

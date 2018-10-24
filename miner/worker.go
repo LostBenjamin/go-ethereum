@@ -288,6 +288,9 @@ func (self *worker) update() {
 	}
 }
 
+
+// (anodar) calls WriteBlockWithState
+// breadcasts chain insertion event
 func (self *worker) wait() {
 	for {
 		mustCommitNewWork := true
@@ -342,6 +345,8 @@ func (self *worker) wait() {
 	}
 }
 
+
+// (anodar) push work(block) to miner agents
 // push sends a new work task to currently live miner agents.
 func (self *worker) push(work *Work) {
 	if atomic.LoadInt32(&self.mining) != 1 {
@@ -387,6 +392,8 @@ func (self *worker) makeCurrent(parent *types.Block, header *types.Header) error
 	return nil
 }
 
+
+// (anodar) commitNewWork() pushes work(block) to mining agents
 func (self *worker) commitNewWork() {
 	self.mu.Lock()
 	defer self.mu.Unlock()
@@ -399,17 +406,25 @@ func (self *worker) commitNewWork() {
 	parent := self.chain.CurrentBlock()
 
 	tstamp := tstart.Unix()
+	log.Info(fmt.Sprintf("tstamp: %v", tstamp))
 	if parent.Time().Cmp(new(big.Int).SetInt64(tstamp)) >= 0 {
 		tstamp = parent.Time().Int64() + 1
+		log.Info(fmt.Sprintf("increased tstamp: %v", tstamp))
 	}
+	/**************************************
+	 (anodar) waiting code is here
+	 **************************************/
 	// this will ensure we're not going off too far in the future
 	if now := time.Now().Unix(); tstamp > now+1 {
+		// log.Info(fmt.Sprintf("**************wtf,  %+v %+v", now, tstamp))
+		// panic("blabla")
 		wait := time.Duration(tstamp-now) * time.Second
 		log.Info("Mining too far in the future", "wait", common.PrettyDuration(wait))
 		time.Sleep(wait)
 	}
 
 	num := parent.Number()
+	// (anodar) block header is set here: parent hash, block number, timestamp...)
 	header := &types.Header{
 		ParentHash: parent.Hash(),
 		Number:     num.Add(num, common.Big1),
@@ -449,11 +464,13 @@ func (self *worker) commitNewWork() {
 	if self.config.DAOForkSupport && self.config.DAOForkBlock != nil && self.config.DAOForkBlock.Cmp(header.Number) == 0 {
 		misc.ApplyDAOHardFork(work.state)
 	}
+	// (anodar) getting pending transactions from TxPool
 	pending, err := self.eth.TxPool().Pending()
 	if err != nil {
 		log.Error("Failed to fetch pending transactions", "err", err)
 		return
 	}
+	// (anodar) adding pending transactions into work (block)
 	txs := types.NewTransactionsByPriceAndNonce(self.current.signer, pending)
 	work.commitTransactions(self.mux, txs, self.chain, self.coinbase)
 
@@ -479,6 +496,7 @@ func (self *worker) commitNewWork() {
 	for _, hash := range badUncles {
 		delete(self.possibleUncles, hash)
 	}
+	// (anodar) block creation that will be passed to consensus engine for sealing
 	// Create the new block to seal with the consensus engine
 	if work.Block, err = self.engine.Finalize(self.chain, header, work.state, work.txs, uncles, work.receipts); err != nil {
 		log.Error("Failed to finalize block for sealing", "err", err)
@@ -521,10 +539,11 @@ func (self *worker) updateSnapshot() {
 	self.snapshotState = self.current.state.Copy()
 }
 
-func (env *Work) commitTransactions(mux *event.TypeMux, txs *types.TransactionsByPriceAndNonce, bc *core.BlockChain, coinbase common.Address) {
+// (anodar) commitTransactions
+func (env *Work) commitTransactions(mux *event.TypeMux, tx *types.Transaction, bc *core.BlockChain, coinbase common.Address) {
 	gp := new(core.GasPool).AddGas(env.header.GasLimit)
 
-	var coalescedLogs []*types.Log
+	var coalescedLogs []*types.Log`
 
 	for {
 		// If we don't have enough gas for any further transactions then we're done
@@ -604,6 +623,7 @@ func (env *Work) commitTransactions(mux *event.TypeMux, txs *types.TransactionsB
 	}
 }
 
+// (anodar) worker.go commitTransaction
 func (env *Work) commitTransaction(tx *types.Transaction, bc *core.BlockChain, coinbase common.Address, gp *core.GasPool) (error, []*types.Log) {
 	snap := env.state.Snapshot()
 
