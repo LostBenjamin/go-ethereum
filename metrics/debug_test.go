@@ -1,7 +1,6 @@
 package metrics
 
 import (
-	"runtime"
 	"runtime/debug"
 	"testing"
 	"time"
@@ -17,10 +16,10 @@ func BenchmarkDebugGCStats(b *testing.B) {
 }
 
 func TestDebugGCStatsBlocking(t *testing.T) {
-	if g := runtime.GOMAXPROCS(0); g < 2 {
-		t.Skipf("skipping TestDebugGCMemStatsBlocking with GOMAXPROCS=%d\n", g)
-		return
-	}
+	// if g := runtime.GOMAXPROCS(0); g < 2 {
+	// 	t.Skipf("skipping TestDebugGCMemStatsBlocking with GOMAXPROCS=%d\n", g)
+	// 	return
+	// }
 	ch := make(chan int)
 	go testDebugGCStatsBlocking(ch)
 	var gcStats debug.GCStats

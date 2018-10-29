@@ -20,10 +20,10 @@ package main
 import (
 	"fmt"
 	"os"
-	"runtime"
 	"sort"
 	"strings"
 	"time"
+
 	// "runtime/pprof"
 
 	"github.com/ethereum/go-ethereum/accounts"
@@ -42,7 +42,6 @@ import (
 const (
 	clientIdentifier = "geth" // Client identifier to advertise over the network
 )
-
 
 var cpuprofile = "/home/anodar/Desktop/profiles/cpu.profile" //flag.String("cpuprofile", "cpu.profile", "write cpu profile to `file`")
 var memprofile = "/home/anodar/Desktop/profiles/mem.profile" //flag.String("memprofile", "mem.profile", "write memory profile to `file`")
@@ -189,7 +188,7 @@ func init() {
 	app.Flags = append(app.Flags, whisperFlags...)
 
 	app.Before = func(ctx *cli.Context) error {
-		runtime.GOMAXPROCS(runtime.NumCPU())
+		// runtime.GOMAXPROCS(runtime.NumCPU())
 		if err := debug.Setup(ctx); err != nil {
 			return err
 		}
@@ -228,7 +227,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
- /* (anodar) memprofile
+	/* (anodar) memprofile
 	if memprofile != "" {
 	    f, err := os.Create(memprofile)
 	    if err != nil {
@@ -240,7 +239,7 @@ func main() {
 	    }
 	    f.Close()
 	}
-*/
+	*/
 }
 
 // geth is the main entry point into the system if no special subcommand is ran.

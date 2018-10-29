@@ -17,7 +17,6 @@
 package core
 
 import (
-	"runtime"
 	"testing"
 	"time"
 
@@ -97,8 +96,8 @@ func testHeaderConcurrentVerification(t *testing.T, threads int) {
 		seals[i] = true
 	}
 	// Set the number of threads to verify on
-	old := runtime.GOMAXPROCS(threads)
-	defer runtime.GOMAXPROCS(old)
+	// old := runtime.GOMAXPROCS(threads)
+	// defer runtime.GOMAXPROCS(old)
 
 	// Run the header checker for the entire block chain at once both for a valid and
 	// also an invalid chain (enough if one arbitrary block is invalid).
@@ -169,8 +168,8 @@ func testHeaderConcurrentAbortion(t *testing.T, threads int) {
 		seals[i] = true
 	}
 	// Set the number of threads to verify on
-	old := runtime.GOMAXPROCS(threads)
-	defer runtime.GOMAXPROCS(old)
+	// old := runtime.GOMAXPROCS(threads)
+	// defer runtime.GOMAXPROCS(old)
 
 	// Start the verifications and immediately abort
 	chain, _ := NewBlockChain(testdb, nil, params.TestChainConfig, ethash.NewFakeDelayer(time.Millisecond), vm.Config{})

@@ -20,7 +20,6 @@ package discv5
 
 import (
 	"os"
-	"runtime"
 	"testing"
 	"unsafe"
 )
@@ -38,6 +37,6 @@ func TestMain(m *testing.M) {
 
 	// Run the actual test. runWithPlaygroundTime ensures that the only test
 	// that runs is the one calling it.
-	runtime.GOMAXPROCS(8)
+	// runtime.GOMAXPROCS(8)
 	os.Exit(m.Run())
 }
