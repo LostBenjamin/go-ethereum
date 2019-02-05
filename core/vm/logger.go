@@ -206,6 +206,9 @@ func (l *StructLogger) Error() error { return l.err }
 // Output returns the VM return value captured by the trace.
 func (l *StructLogger) Output() []byte { return l.output }
 
+// ChangedValues returns the VM changed storage values captured by the trace.
+func (l *StructLogger) ChangedValues() map[common.Address]Storage { return l.changedValues }
+
 // WriteTrace writes a formatted trace to the given writer
 func WriteTrace(writer io.Writer, logs []StructLog) {
 	for _, log := range logs {
